@@ -456,7 +456,6 @@ class VL53L5CX:
             if go2_status0 & 0x1 != 0:
                 break
 
-        # }while (timeout < (uint16_t)500)
         if status != 0:
             raise VL53L5CXException(status)
 
@@ -475,7 +474,6 @@ class VL53L5CX:
 
         # Data extrapolation is required for 4X4 offset
         if resolution == VL53L5CX_RESOLUTION_4X4:
-            # (void)memcpy(&(p_dev->temp_buffer[0x10]), dss_4x4, sizeof(dss_4x4))
             self.temp_buffer[16:16 + len(dss_4x4)] = dss_4x4[:]
 
             self.swap_buffer(self.temp_buffer, VL53L5CX_OFFSET_BUFFER_SIZE)
@@ -483,10 +481,8 @@ class VL53L5CX:
             if DEBUG_LOW_LEVEL_LOGIC_SEND_OFFSET_DATA:
                 print(f"_vl53l5cx_send_offset_data: (pre) signal_grid_len={len(signal_grid)}, range_grid_len={len(range_grid)}, temp_buffer_len={len(self.temp_buffer)}")
 
-            # (void)memcpy(signal_grid,&(p_dev->temp_buffer[0x3C]), sizeof(signal_grid))
             signal_grid[:] = self.temp_buffer[0x3C:0x3C + len(signal_grid)]
 
-            # (void)memcpy(range_grid,&(p_dev->temp_buffer[0x140]), sizeof(range_grid))
             range_grid[:] = self.temp_buffer[0x140:0x140 + len(range_grid)]
 
             if DEBUG_LOW_LEVEL_LOGIC_SEND_OFFSET_DATA:
@@ -506,9 +502,7 @@ class VL53L5CX:
                     print(f"{range_grid[i + 1]:0{2}x}{range_grid[i + 0]:0{2}x}", end="")
                 print("]")
 
-            # for (j = 0; j < (int8_t)4; j++)
             for j in range(4):
-                # for (i = 0; i < (int8_t)4 ; i++)
                 for i in range(4):
                     k = (i + 4 * j) * 4
                     l = ((2 * i) + (16 * j)) * 4
@@ -531,9 +525,7 @@ class VL53L5CX:
                         v = v // 4
                     short_to_buffer(v, range_grid, k)
 
-            # (void)memset(&range_grid[0x10], 0, (uint16_t)96)
             range_grid[0x10 * 2:0x10 * 2 + 96] = [0] * 96
-            # (void)memset(&signal_grid[0x10], 0, (uint16_t)192)
             signal_grid[0x10 * 4:0x10 * 4 + 192] = [0] * 192
             if DEBUG_LOW_LEVEL_LOGIC_SEND_OFFSET_DATA:
                 print(f"_vl53l5cx_send_offset_data: signal_grid=[", end="")
@@ -551,18 +543,14 @@ class VL53L5CX:
                     print(f"{range_grid[i + 1]:0{2}x}{range_grid[i + 0]:0{2}x}", end="")
                 print("]")
 
-            # (void)memcpy(&(p_dev->temp_buffer[0x3C]), signal_grid, sizeof(signal_grid))
             self.temp_buffer[0x3C: 0x3C + len(signal_grid)] = signal_grid[:]
-            # (void)memcpy(&(p_dev->temp_buffer[0x140]), range_grid, sizeof(range_grid))
             self.temp_buffer[0x140: 0x140 + len(range_grid)] = range_grid[:]
 
             self.swap_buffer(self.temp_buffer, VL53L5CX_OFFSET_BUFFER_SIZE)
 
-        # for(k = 0; k < (VL53L5CX_OFFSET_BUFFER_SIZE - (uint16_t)4); k++)
         for k in range(VL53L5CX_OFFSET_BUFFER_SIZE - 4):
             self.temp_buffer[k] = self.temp_buffer[k + 8]
 
-        # (void)memcpy(&(p_dev->temp_buffer[0x1E0]), footer, 8)
         self.temp_buffer[0x1E0: 0x1E0 + 8] = footer[:]
         self.wr_multi(0x2e18, self.temp_buffer, VL53L5CX_OFFSET_BUFFER_SIZE)
         self._vl53l5cx_poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
@@ -578,25 +566,18 @@ class VL53L5CX:
         dss_4x4 = [0x00, 0x78, 0x00, 0x08, 0x00, 0x00, 0x00, 0x08]
         profile_4x4 = [0xA0, 0xFC, 0x01, 0x00]
         signal_grid = [0] * 64 * 4
-        # int8_t i, j
 
-        # (void)memcpy(p_dev->temp_buffer, &(p_dev->xtalk_data[0]), VL53L5CX_XTALK_BUFFER_SIZE)
         self.temp_buffer[:VL53L5CX_XTALK_BUFFER_SIZE] = self.xtalk_data[0: VL53L5CX_XTALK_BUFFER_SIZE]
 
         # Data extrapolation is required for 4X4 Xtalk
         if resolution == VL53L5CX_RESOLUTION_4X4:
-            # (void)memcpy(&(p_dev->temp_buffer[0x8]), res4x4, sizeof(res4x4))
             self.temp_buffer[0x8: 0x8 + len(res4x4)] = res4x4[:]
-            # (void)memcpy(&(p_dev->temp_buffer[0x020]), dss_4x4, sizeof(dss_4x4))
             self.temp_buffer[0x020: 0x020 + len(dss_4x4)] = dss_4x4[:]
 
             self.swap_buffer(self.temp_buffer, VL53L5CX_XTALK_BUFFER_SIZE)
-            # (void)memcpy(signal_grid, &(p_dev->temp_buffer[0x34]), sizeof(signal_grid))
             signal_grid[:] = self.temp_buffer[0x34:0x34 + len(signal_grid)]
 
-            # for (j = 0; j < (int8_t)4; j++)
             for j in range(4):
-                # for (i = 0; i < (int8_t)4 ; i++)
                 for i in range(4):
                     k = (i + 4 * j) * 4
                     l = ((2 * i) + (16 * j)) * 4
@@ -606,14 +587,10 @@ class VL53L5CX:
                         + to_long_uint(signal_grid, l + 9 * 4)) // 4
                     ulong_to_buffer(v, signal_grid, k)
 
-            # (void)memset(&signal_grid[0x10], 0, (uint32_t)192)
             signal_grid[0x10 * 4:0x10 * 4 + 192] = [0] * 192
-            # (void)memcpy(&(p_dev->temp_buffer[0x34]), signal_grid, sizeof(signal_grid))
             self.temp_buffer[0x34: 0x34 + len(signal_grid)] = signal_grid[:]
             self.swap_buffer(self.temp_buffer, VL53L5CX_XTALK_BUFFER_SIZE)
-            # (void)memcpy(&(p_dev->temp_buffer[0x134]), profile_4x4, sizeof(profile_4x4))
             self.temp_buffer[0x134:0x134 + len(profile_4x4)] = profile_4x4[:]
-            # (void)memset(&(p_dev->temp_buffer[0x078]),0 , (uint32_t)4*sizeof(uint8_t))
             self.temp_buffer[0x078:0x078 + 4] = [0] * 4
 
         self.wr_multi(0x2cf8, self.temp_buffer, VL53L5CX_XTALK_BUFFER_SIZE)
@@ -741,12 +718,10 @@ class VL53L5CX:
         self.wr_multi(0x2fd8, self.buffers.VL53L5CX_GET_NVM_CMD, len(self.buffers.VL53L5CX_GET_NVM_CMD))
         self._vl53l5cx_poll_for_answer(4, 0, VL53L5CX_UI_CMD_STATUS, 0xff, 2)
         self.rd_multi(VL53L5CX_UI_CMD_START, self.temp_buffer, VL53L5CX_NVM_DATA_SIZE)
-        # (void)memcpy(p_dev->offset_data, p_dev->temp_buffer, VL53L5CX_OFFSET_BUFFER_SIZE)
         self.offset_data[:VL53L5CX_OFFSET_BUFFER_SIZE] = self.temp_buffer[:VL53L5CX_OFFSET_BUFFER_SIZE]
         self._vl53l5cx_send_offset_data(VL53L5CX_RESOLUTION_4X4)
 
         # Set default Xtalk shape. Send Xtalk to sensor
-        # (void)memcpy(p_dev->xtalk_data, (uint8_t*)VL53L5CX_DEFAULT_XTALK, VL53L5CX_XTALK_BUFFER_SIZE)
         self.xtalk_data[:VL53L5CX_XTALK_BUFFER_SIZE] = self.buffers.VL53L5CX_DEFAULT_XTALK[:VL53L5CX_XTALK_BUFFER_SIZE]
         self._vl53l5cx_send_xtalk_data(VL53L5CX_RESOLUTION_4X4)
 
@@ -760,7 +735,6 @@ class VL53L5CX:
 
         if self.nb_target_per_zone != 1:
             tmp = [self.nb_target_per_zone]
-            # tmp = self.vl53l5cx_dci_replace_data(self.temp_buffer, VL53L5CX_DCI_FW_NB_TARGET, 16, 1, 0x0C)
             self.vl53l5cx_dci_replace_data(self.temp_buffer, VL53L5CX_DCI_FW_NB_TARGET, 16, tmp, 1, 0x0C)
 
         self.vl53l5cx_dci_write_data(single_range, VL53L5CX_DCI_SINGLE_RANGE, len(single_range))
@@ -859,13 +833,11 @@ class VL53L5CX:
             output_bh_enable[0] += 2048
 
         DIVIDE_FACTOR = 32
-        # DIVIDE_FACTOR = 3
 
         if DEBUG_LOW_LEVEL_LOGIC_START_RANGING:
             print(f"vl53l5cx_start_ranging:    output_bh_enable[0]={output_bh_enable[0]:0{8}x}")
 
         # Update data size
-        # for (i = 0; i < (uint32_t)(sizeof(output)/sizeof(uint32_t)); i++)
         total_output_len = len(output)
         for i in range(total_output_len):
             if (output[i] == 0) or ((output_bh_enable[i // DIVIDE_FACTOR] & (1 << (i % 32))) == 0):
@@ -873,7 +845,6 @@ class VL53L5CX:
                     print(f"vl53l5cx_start_ranging:    continue output[{i}]={output[i]:0{8}x}, output_bh_enable[{i // DIVIDE_FACTOR}]={output_bh_enable[i // DIVIDE_FACTOR]:0{8}x}")
                 continue
 
-            # bh_ptr = (union Block_header *)&(output[i])
             bh_ptr_type = output[i] & 0x0f
             bh_ptr_idx = (output[i] >> 16) & 0xffff
             if DEBUG_LOW_LEVEL_LOGIC_START_RANGING:
@@ -1009,9 +980,7 @@ class VL53L5CX:
             print(f"vl53l5cx_get_ranging_data: streamcount={self.streamcount}")
 
         # Start conversion at position 16 to avoid headers
-        # for (i = (uint32_t)16; i < (uint32_t)p_dev->data_read_size; i+=(uint32_t)4)
         for i in range(16, self.data_read_size, 4):
-            # bh_ptr = (union Block_header *)&(self.temp_buffer[i])
             bh_ptr_type = self.temp_buffer[i] & 0x0f
             bh_ptr_size = (self.temp_buffer[i] >> 4) & 0xf | (self.temp_buffer[i + 1] << 4)
             if 0x1 < bh_ptr_type < 0xd:
@@ -1024,33 +993,23 @@ class VL53L5CX:
             if bh_ptr_idx == self.VL53L5CX_METADATA_IDX:
                 p_results.silicon_temp_degc = self.temp_buffer[i + 12]
             elif not self.disable_ambient_per_spad and bh_ptr_idx == self.VL53L5CX_AMBIENT_RATE_IDX:
-                # (void)memcpy(p_results->ambient_per_spad, &(p_dev->temp_buffer[i + (uint32_t)4]), msize)
                 to_ulong_array(p_results.ambient_per_spad, self.temp_buffer, i + 4, msize)
             elif not self.disable_nb_spads_enabled and bh_ptr_idx == self.VL53L5CX_SPAD_COUNT_IDX:
-                # (void)memcpy(p_results->nb_spads_enabled, &(p_dev->temp_buffer[i + (uint32_t)4]), msize)
                 to_ulong_array(p_results.nb_spads_enabled, self.temp_buffer, i + 4, msize)
             elif not self.disable_nb_target_detected and bh_ptr_idx == self.VL53L5CX_NB_TARGET_DETECTED_IDX:
-                # (void)memcpy(p_results->nb_target_detected, &(p_dev->temp_buffer[i + (uint32_t)4]), msize)
                 p_results.nb_target_detected[:msize] = self.temp_buffer[i + 4: i + 4 + msize]
             elif not self.disable_signal_per_spad and bh_ptr_idx == self.VL53L5CX_SIGNAL_RATE_IDX:
-                # (void)memcpy(p_results->signal_per_spad, &(p_dev->temp_buffer[i + (uint32_t)4]), msize)
                 to_ulong_array(p_results.signal_per_spad, self.temp_buffer, i + 4, msize)
             elif not self.disable_range_sigma_mm and bh_ptr_idx == self.VL53L5CX_RANGE_SIGMA_MM_IDX:
-                # (void)memcpy(p_results->range_sigma_mm, &(p_dev->temp_buffer[i + (uint32_t)4]), msize)
                 to_uint_array(p_results.range_sigma_mm, self.temp_buffer, i + 4, msize)
             elif not self.disable_distance_mm and bh_ptr_idx == self.VL53L5CX_DISTANCE_IDX:
-                # (void)memcpy(p_results->distance_mm, &(p_dev->temp_buffer[i + (uint32_t)4]), msize)
                 to_uint_array(p_results.distance_mm, self.temp_buffer, i + 4, msize)
             elif not self.disable_reflectance_percent and bh_ptr_idx == self.VL53L5CX_REFLECTANCE_EST_PC_IDX:
-                # (void)memcpy(p_results->reflectance, &(p_dev->temp_buffer[i + (uint32_t)4]), msize)
                 p_results.reflectance[:msize] = self.temp_buffer[i + 4: i + 4 + msize]
             elif not self.disable_target_status and bh_ptr_idx == self.VL53L5CX_TARGET_STATUS_IDX:
-                # (void)memcpy(p_results->target_status, &(p_dev->temp_buffer[i + (uint32_t)4]), msize)
                 p_results.target_status[:msize] = self.temp_buffer[i + 4: i + 4 + msize]
             elif not self.disable_motion_indicator and bh_ptr_idx == self.VL53L5CX_MOTION_DETEC_IDX:
-                # (void)memcpy(&p_results->motion_indicator, &(p_dev->temp_buffer[i + (uint32_t)4]), msize)
 
-                # p_results.motion_indicator[:msize] = self.temp_buffer[i + 4: i + 4 + msize]
                 if DEBUG_LOW_LEVEL_LOGIC_GET_RANGING_DATA:
                     print(f"vl53l5cx_get_ranging_data: i+4={i + 4} msize={msize}, len(self.temp_buffer)={len(self.temp_buffer)}")
                 p_results.update_motion_indicator(self.temp_buffer, i + 4, msize)
@@ -1060,11 +1019,9 @@ class VL53L5CX:
 
             # Convert data into their real format */
             if not self.disable_ambient_per_spad:
-                # for(i = 0; i < (uint32_t)VL53L5CX_RESOLUTION_8X8; i++)
                 for i in range(VL53L5CX_RESOLUTION_8X8):
                     p_results.ambient_per_spad[i] /= 2048
 
-            # for(i = 0; i < (uint32_t)(VL53L5CX_RESOLUTION_8X8 *VL53L5CX_NB_TARGET_PER_ZONE); i++)
             for i in range((VL53L5CX_RESOLUTION_8X8 * self.nb_target_per_zone)):
                 if not self.disable_distance_mm:
                     p_results.distance_mm[i] /= 4
@@ -1078,16 +1035,13 @@ class VL53L5CX:
             # TODO optimise inner IF - take it out!!!
             # Set target status to 255 if no target is detected for this zone
             if not self.disable_nb_target_detected:
-                # for(i = 0; i < (uint32_t)VL53L5CX_RESOLUTION_8X8; i++)
                 for i in range(VL53L5CX_RESOLUTION_8X8):
                     if p_results.nb_target_detected[i] == 0:
-                        # for(j = 0; j < (uint32_t)VL53L5CX_NB_TARGET_PER_ZONE; j++)
                         if not self.disable_target_status:
                             for j in range(self.nb_target_per_zone):
                                 p_results.target_status[(self.nb_target_per_zone * i) + j] = 255
 
             if not self.disable_motion_indicator:
-                # for (i = 0; i < (uint32_t)32; i++)
                 for i in range(32):
                     p_results.motion[i] /= 65535
 
@@ -1232,7 +1186,6 @@ class VL53L5CX:
             self.swap_buffer(self.temp_buffer, data_size + 12)
 
             # Copy data from FW into input structure (-4 bytes to remove header)
-            # for(i = 0 ; i < (int16_t)data_size;i++){
             for i in range(data_size):
                 data[i] = self.temp_buffer[i + 4]
             # data[:data_size] = self.temp_buffer[4: data_size + 4]
@@ -1260,14 +1213,11 @@ class VL53L5CX:
 
             # Copy data from structure to FW format (+4 bytes to add header)
             self.swap_buffer(data, data_size)
-            # for(i = (int16_t)data_size - (int16_t)1 ; i >= 0; i--)
             for i in range(data_size - 1, -1, -1):
                 self.temp_buffer[i + 4] = data[i]
 
             # Add headers and footer
-            # (void)memcpy(&p_dev->temp_buffer[0], headers, sizeof(headers))
             self.temp_buffer[:len(headers)] = headers[:]
-            # (void)memcpy(&p_dev->temp_buffer[data_size + (uint16_t)4], footer, sizeof(footer))
             self.temp_buffer[data_size + 4: data_size + 4 + len(footer)] = footer[:]
 
             # Send data to FW
@@ -1285,6 +1235,5 @@ class VL53L5CX:
                                   new_data_pos: int) -> None:
 
         self.vl53l5cx_dci_read_data(data, index, data_size)
-        # (void)memcpy(&(data[new_data_pos]), new_data, new_data_size)
         data[new_data_pos: new_data_pos + data_size] = new_data[:new_data_size]
         self.vl53l5cx_dci_write_data(data, index, data_size)
