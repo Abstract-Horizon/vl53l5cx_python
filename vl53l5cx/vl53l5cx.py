@@ -409,7 +409,7 @@ class VL53L5CX:
     def wait_ms(ms: int) -> None:
         time.sleep(ms / 1000)
 
-    def _vl53l5cx_poll_for_answer(
+    def _poll_for_answer(
             self,
             size: int, pos: int, address: int, mask: int, expected_value: int) -> None:
         """
@@ -434,7 +434,7 @@ class VL53L5CX:
             else:
                 timeout += 1
 
-    def _vl53l5cx_poll_for_mcu_boot(self) -> None:
+    def _poll_for_mcu_boot(self) -> None:
         """
         Inner function, not available outside this file. This function is used to
         wait for the MCU to boot.
@@ -459,7 +459,7 @@ class VL53L5CX:
         if status != 0:
             raise VL53L5CXException(status)
 
-    def _vl53l5cx_send_offset_data(self, resolution: int) -> None:
+    def _send_offset_data(self, resolution: int) -> None:
         """
         @brief Inner function, not available outside this file. This function is used
         to set the offset data gathered from NVM.
@@ -479,23 +479,23 @@ class VL53L5CX:
             self.swap_buffer(self.temp_buffer, VL53L5CX_OFFSET_BUFFER_SIZE)
 
             if DEBUG_LOW_LEVEL_LOGIC_SEND_OFFSET_DATA:
-                print(f"_vl53l5cx_send_offset_data: (pre) signal_grid_len={len(signal_grid)}, range_grid_len={len(range_grid)}, temp_buffer_len={len(self.temp_buffer)}")
+                print(f"_send_offset_data: (pre) signal_grid_len={len(signal_grid)}, range_grid_len={len(range_grid)}, temp_buffer_len={len(self.temp_buffer)}")
 
             signal_grid[:] = self.temp_buffer[0x3C:0x3C + len(signal_grid)]
 
             range_grid[:] = self.temp_buffer[0x140:0x140 + len(range_grid)]
 
             if DEBUG_LOW_LEVEL_LOGIC_SEND_OFFSET_DATA:
-                print(f"_vl53l5cx_send_offset_data: signal_grid_len={len(signal_grid)}, range_grid_len={len(range_grid)}")
+                print(f"_send_offset_data: signal_grid_len={len(signal_grid)}, range_grid_len={len(range_grid)}")
             if DEBUG_LOW_LEVEL_LOGIC_SEND_OFFSET_DATA:
-                print(f"_vl53l5cx_send_offset_data: signal_grid=[", end="")
+                print(f"_send_offset_data: signal_grid=[", end="")
                 for i in range(0, len(signal_grid), 4):
                     if i > 0:
                         print(", ", end="")
                     print(f"{signal_grid[i + 3]:0{2}x}{signal_grid[i + 2]:0{2}x}{signal_grid[i + 1]:0{2}x}{signal_grid[i + 0]:0{2}x}", end="")
                 print("]")
             if DEBUG_LOW_LEVEL_LOGIC_SEND_OFFSET_DATA:
-                print(f"_vl53l5cx_send_offset_data: range_grid=[", end="")
+                print(f"_send_offset_data: range_grid=[", end="")
                 for i in range(0, len(range_grid), 2):
                     if i > 0:
                         print(", ", end="")
@@ -528,7 +528,7 @@ class VL53L5CX:
             range_grid[0x10 * 2:0x10 * 2 + 96] = [0] * 96
             signal_grid[0x10 * 4:0x10 * 4 + 192] = [0] * 192
             if DEBUG_LOW_LEVEL_LOGIC_SEND_OFFSET_DATA:
-                print(f"_vl53l5cx_send_offset_data: signal_grid=[", end="")
+                print(f"_send_offset_data: signal_grid=[", end="")
                 for i in range(0, len(signal_grid), 4):
                     if i > 0:
                         print(", ", end="")
@@ -536,7 +536,7 @@ class VL53L5CX:
                 print("]")
 
             if DEBUG_LOW_LEVEL_LOGIC_SEND_OFFSET_DATA:
-                print(f"_vl53l5cx_send_offset_data: range_grid=[", end="")
+                print(f"_send_offset_data: range_grid=[", end="")
                 for i in range(0, len(range_grid), 2):
                     if i > 0:
                         print(", ", end="")
@@ -553,10 +553,9 @@ class VL53L5CX:
 
         self.temp_buffer[0x1E0: 0x1E0 + 8] = footer[:]
         self.wr_multi(0x2e18, self.temp_buffer, VL53L5CX_OFFSET_BUFFER_SIZE)
-        self._vl53l5cx_poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
+        self._poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
 
-    def _vl53l5cx_send_xtalk_data(self,
-                                  resolution: int) -> None:
+    def _send_xtalk_data(self, resolution: int) -> None:
         """
         @brief Inner function, not available outside this file. This function is used
         to set the Xtalk data from generic configuration, or user's calibration.
@@ -594,7 +593,7 @@ class VL53L5CX:
             self.temp_buffer[0x078:0x078 + 4] = [0] * 4
 
         self.wr_multi(0x2cf8, self.temp_buffer, VL53L5CX_XTALK_BUFFER_SIZE)
-        self._vl53l5cx_poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
+        self._poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
 
     def vl53l5cx_is_alive(self) -> bool:
         self.wr_byte(0x7fff, 0x00)
@@ -638,7 +637,7 @@ class VL53L5CX:
 
         # Wait for sensor booted (several ms required to get sensor ready )
         self.wr_byte(0x7fff, 0x00)
-        self._vl53l5cx_poll_for_answer(1, 0, 0x06, 0xff, 1)
+        self._poll_for_answer(1, 0, 0x06, 0xff, 1)
 
         self.wr_byte(0x000E, 0x01)
         self.wr_byte(0x7fff, 0x02)
@@ -646,7 +645,7 @@ class VL53L5CX:
         # Enable FW access
         self.wr_byte(0x03, 0x0D)
         self.wr_byte(0x7fff, 0x01)
-        self._vl53l5cx_poll_for_answer(1, 0, 0x21, 0x10, 0x10)
+        self._poll_for_answer(1, 0, 0x21, 0x10, 0x10)
         self.wr_byte(0x7fff, 0x00)
 
         # Enable host access to GO1
@@ -693,7 +692,7 @@ class VL53L5CX:
         self.wr_byte(0x7fff, 0x02)
         self.wr_byte(0x03, 0x0D)
         self.wr_byte(0x7fff, 0x01)
-        self._vl53l5cx_poll_for_answer(1, 0, 0x21, 0x10, 0x10)
+        self._poll_for_answer(1, 0, 0x21, 0x10, 0x10)
         # self.wr_byte(0x7fff, 0x00)
         # tmp = self.rd_byte(0x7fff)
         self.wr_byte(0x7fff, 0x00)
@@ -710,26 +709,26 @@ class VL53L5CX:
         # self.rd_byte(0x7fff)
         self.wr_byte(0x0C, 0x00)
         self.wr_byte(0x0B, 0x01)
-        self._vl53l5cx_poll_for_answer(1, 0, 0x06, 0xff, 0x00)
-        # self._vl53l5cx_poll_for_mcu_boot()
+        self._poll_for_answer(1, 0, 0x06, 0xff, 0x00)
+        # self._poll_for_mcu_boot()
         self.wr_byte(0x7fff, 0x02)
 
         # Get offset NVM data and store them into the offset buffer
         self.wr_multi(0x2fd8, self.buffers.VL53L5CX_GET_NVM_CMD, len(self.buffers.VL53L5CX_GET_NVM_CMD))
-        self._vl53l5cx_poll_for_answer(4, 0, VL53L5CX_UI_CMD_STATUS, 0xff, 2)
+        self._poll_for_answer(4, 0, VL53L5CX_UI_CMD_STATUS, 0xff, 2)
         self.rd_multi(VL53L5CX_UI_CMD_START, self.temp_buffer, VL53L5CX_NVM_DATA_SIZE)
         self.offset_data[:VL53L5CX_OFFSET_BUFFER_SIZE] = self.temp_buffer[:VL53L5CX_OFFSET_BUFFER_SIZE]
-        self._vl53l5cx_send_offset_data(VL53L5CX_RESOLUTION_4X4)
+        self._send_offset_data(VL53L5CX_RESOLUTION_4X4)
 
         # Set default Xtalk shape. Send Xtalk to sensor
         self.xtalk_data[:VL53L5CX_XTALK_BUFFER_SIZE] = self.buffers.VL53L5CX_DEFAULT_XTALK[:VL53L5CX_XTALK_BUFFER_SIZE]
-        self._vl53l5cx_send_xtalk_data(VL53L5CX_RESOLUTION_4X4)
+        self._send_xtalk_data(VL53L5CX_RESOLUTION_4X4)
 
         # Send default configuration to VL53L5CX firmware
         self.wr_multi(0x2c34,
                       self.default_configuration,
                       len(self.buffers.VL53L5CX_DEFAULT_CONFIGURATION))
-        self._vl53l5cx_poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
+        self._poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
 
         self.vl53l5cx_dci_write_data(pipe_ctrl, VL53L5CX_DCI_PIPE_CONTROL, len(pipe_ctrl))
 
@@ -767,11 +766,11 @@ class VL53L5CX:
             if power_mode == VL53L5CX_POWER_MODE_WAKEUP:
                 self.wr_byte(0x7FFF, 0x00)
                 self.wr_byte(0x09, 0x04)
-                self._vl53l5cx_poll_for_answer(1, 0, 0x06, 0x01, 1)
+                self._poll_for_answer(1, 0, 0x06, 0x01, 1)
             elif power_mode == VL53L5CX_POWER_MODE_SLEEP:
                 self.wr_byte(0x7FFF, 0x00)
                 self.wr_byte(0x09, 0x02)
-                self._vl53l5cx_poll_for_answer(1, 0, 0x06, 0x01, 0)
+                self._poll_for_answer(1, 0, 0x06, 0x01, 0)
             else:
                 raise VL53L5CXException(VL53L5CX_STATUS_ERROR)
 
@@ -895,7 +894,7 @@ class VL53L5CX:
 
         # Start ranging session
         self.wr_multi(VL53L5CX_UI_CMD_END - (4 - 1), cmd, len(cmd))
-        self._vl53l5cx_poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
+        self._poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
 
         # Read ui range data content and compare if data size is the correct one
         # self.vl53l5cx_dci_read_data(self.temp_buffer, 0x5440, 12)
@@ -1081,8 +1080,8 @@ class VL53L5CX:
         else:
             raise VL53L5CXException(VL53L5CX_STATUS_INVALID_PARAM)
 
-        self._vl53l5cx_send_offset_data(resolution)
-        self._vl53l5cx_send_xtalk_data(resolution)
+        self._send_offset_data(resolution)
+        self._send_xtalk_data(resolution)
 
     def vl53l5cx_get_ranging_frequency_hz(self) -> int:
         self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_FREQ_HZ, 4)
@@ -1179,7 +1178,7 @@ class VL53L5CX:
 
             # Request data reading from FW
             self.wr_multi(VL53L5CX_UI_CMD_END - 11, cmd, len(cmd))
-            self._vl53l5cx_poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
+            self._poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
 
             # Read new data sent (4 bytes header + data_size + 8 bytes footer)
             self.rd_multi(VL53L5CX_UI_CMD_START, self.temp_buffer, rd_size)
@@ -1222,7 +1221,7 @@ class VL53L5CX:
 
             # Send data to FW
             self.wr_multi(address, self.temp_buffer, data_size + 12)
-            self._vl53l5cx_poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
+            self._poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
 
             self.swap_buffer(data, data_size)
 
