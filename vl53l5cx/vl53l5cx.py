@@ -595,7 +595,7 @@ class VL53L5CX:
         self.wr_multi(0x2cf8, self.temp_buffer, VL53L5CX_XTALK_BUFFER_SIZE)
         self._poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
 
-    def vl53l5cx_is_alive(self) -> bool:
+    def is_alive(self) -> bool:
         self.wr_byte(0x7fff, 0x00)
         device_id = self.rd_byte(0)
         revision_id = self.rd_byte(1)
@@ -603,7 +603,7 @@ class VL53L5CX:
 
         return device_id == 0xF0 and revision_id == 0x02
 
-    def vl53l5cx_init(self) -> None:
+    def init(self) -> None:
         pipe_ctrl = [self.nb_target_per_zone, 0x00, 0x01, 0x00]
         # single_range = [0, 0, 0, 0x01]
         single_range = [0x01, 0, 0, 0]
@@ -730,21 +730,21 @@ class VL53L5CX:
                       len(self.buffers.VL53L5CX_DEFAULT_CONFIGURATION))
         self._poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
 
-        self.vl53l5cx_dci_write_data(pipe_ctrl, VL53L5CX_DCI_PIPE_CONTROL, len(pipe_ctrl))
+        self.dci_write_data(pipe_ctrl, VL53L5CX_DCI_PIPE_CONTROL, len(pipe_ctrl))
 
         if self.nb_target_per_zone != 1:
             tmp = [self.nb_target_per_zone]
-            self.vl53l5cx_dci_replace_data(self.temp_buffer, VL53L5CX_DCI_FW_NB_TARGET, 16, tmp, 1, 0x0C)
+            self.dci_replace_data(self.temp_buffer, VL53L5CX_DCI_FW_NB_TARGET, 16, tmp, 1, 0x0C)
 
-        self.vl53l5cx_dci_write_data(single_range, VL53L5CX_DCI_SINGLE_RANGE, len(single_range))
+        self.dci_write_data(single_range, VL53L5CX_DCI_SINGLE_RANGE, len(single_range))
 
-    def vl53l5cx_set_i2c_address(self, i2c_address: int) -> None:
+    def set_i2c_address(self, i2c_address: int) -> None:
         self.wr_byte(0x7fff, 0x00)
         self.wr_byte(0x4, i2c_address >> 1)
         self.i2c_address = i2c_address
         self.wr_byte(0x7fff, 0x02)
 
-    def vl53l5cx_get_power_mode(self) -> int:
+    def get_power_mode(self) -> int:
 
         self.wr_byte(0x7FFF, 0x00)
         tmp = self.rd_byte(0x009)
@@ -760,8 +760,8 @@ class VL53L5CX:
 
         return p_power_mode
 
-    def vl53l5cx_set_power_mode(self, power_mode: int) -> None:
-        current_power_mode = self.vl53l5cx_get_power_mode()
+    def set_power_mode(self, power_mode: int) -> None:
+        current_power_mode = self.get_power_mode()
         if power_mode != current_power_mode:
             if power_mode == VL53L5CX_POWER_MODE_WAKEUP:
                 self.wr_byte(0x7FFF, 0x00)
@@ -776,7 +776,7 @@ class VL53L5CX:
 
             self.wr_byte(0x7FFF, 0x02)
 
-    def vl53l5cx_start_ranging(self) -> None:
+    def start_ranging(self) -> None:
         header_config = [0, 0]
 
         # union Block_header *bh_ptr
@@ -788,7 +788,7 @@ class VL53L5CX:
         #    }
         cmd = [0x00, 0x03, 0x00, 0x00]
 
-        resolution = self.vl53l5cx_get_resolution()
+        resolution = self.get_resolution()
         self.data_read_size = 0
         self.streamcount = 255
 
@@ -873,7 +873,7 @@ class VL53L5CX:
             print(f"vl53l5cx_start_ranging:  final data_read_size={self.data_read_size}")
 
         output_bytes = long_array_to_bytes(output)
-        self.vl53l5cx_dci_write_data(output_bytes, VL53L5CX_DCI_OUTPUT_LIST, len(output_bytes))
+        self.dci_write_data(output_bytes, VL53L5CX_DCI_OUTPUT_LIST, len(output_bytes))
 
         header_config[0] = self.data_read_size
         header_config[1] = total_output_len + 1
@@ -882,10 +882,10 @@ class VL53L5CX:
             print(f"vl53l5cx_start_ranging:  header_config={header_config[0]:0{8}x} {header_config[1]:0{8}x}")
 
         header_config_bytes = long_array_to_bytes(header_config)
-        self.vl53l5cx_dci_write_data(header_config_bytes, VL53L5CX_DCI_OUTPUT_CONFIG, len(header_config_bytes))
+        self.dci_write_data(header_config_bytes, VL53L5CX_DCI_OUTPUT_CONFIG, len(header_config_bytes))
 
         output_bh_enable_bytes = long_array_to_bytes(output_bh_enable)
-        self.vl53l5cx_dci_write_data(output_bh_enable_bytes, VL53L5CX_DCI_OUTPUT_ENABLES, len(output_bh_enable_bytes))
+        self.dci_write_data(output_bh_enable_bytes, VL53L5CX_DCI_OUTPUT_ENABLES, len(output_bh_enable_bytes))
 
         # Start xshut bypass (interrupt mode)
         self.wr_byte(0x7fff, 0x00)
@@ -897,7 +897,7 @@ class VL53L5CX:
         self._poll_for_answer(4, 1, VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
 
         # Read ui range data content and compare if data size is the correct one
-        # self.vl53l5cx_dci_read_data(self.temp_buffer, 0x5440, 12)
+        # self.dci_read_data(self.temp_buffer, 0x5440, 12)
         # # memcpy(&tmp, &(p_dev->temp_buffer[0x8]), sizeof(tmp))
         #
         # size = self.temp_buffer[8] + self.temp_buffer[9] * 0x100
@@ -906,7 +906,7 @@ class VL53L5CX:
         #     print(f"vl53l5cx_start_ranging: size={size} != data_read_size={self.data_read_size}, temp_buffer={self.temp_buffer[:32]}")
         #     # raise VL53L5CXException(VL53L5CX_STATUS_ERROR)
 
-    def vl53l5cx_stop_ranging(self) -> None:
+    def stop_ranging(self) -> None:
         timeout = 0
         buf = [0, 0, 0, 0]
 
@@ -947,7 +947,7 @@ class VL53L5CX:
         self.wr_byte(0x09, 0x04)
         self.wr_byte(0x7fff, 0x02)
 
-    def vl53l5cx_check_data_ready(self) -> bool:
+    def check_data_ready(self) -> bool:
 
         self.rd_multi(0x0, self.temp_buffer, 4)
 
@@ -967,7 +967,7 @@ class VL53L5CX:
             print(f"vl53l5cx_check_data_ready: buf={self.temp_buffer[:4]}, streamcount={self.streamcount}")
         return False
 
-    def vl53l5cx_get_ranging_data(self) -> VL53L5CXResultsData:
+    def get_ranging_data(self) -> VL53L5CXResultsData:
         p_results = VL53L5CXResultsData(self.nb_target_per_zone)
 
         if DEBUG_LOW_LEVEL_LOGIC_GET_RANGING_DATA:
@@ -1046,56 +1046,56 @@ class VL53L5CX:
 
         return p_results
 
-    def vl53l5cx_get_resolution(self) -> int:
-        self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_ZONE_CONFIG, 8)
+    def get_resolution(self) -> int:
+        self.dci_read_data(self.temp_buffer, VL53L5CX_DCI_ZONE_CONFIG, 8)
         return self.temp_buffer[0x00] * self.temp_buffer[0x01]
 
-    def vl53l5cx_set_resolution(self, resolution: int) -> None:
+    def set_resolution(self, resolution: int) -> None:
         if resolution == VL53L5CX_RESOLUTION_4X4:
-            self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_DSS_CONFIG, 16)
+            self.dci_read_data(self.temp_buffer, VL53L5CX_DCI_DSS_CONFIG, 16)
             self.temp_buffer[0x04] = 64
             self.temp_buffer[0x06] = 64
             self.temp_buffer[0x09] = 4
-            self.vl53l5cx_dci_write_data(self.temp_buffer, VL53L5CX_DCI_DSS_CONFIG, 16)
+            self.dci_write_data(self.temp_buffer, VL53L5CX_DCI_DSS_CONFIG, 16)
 
-            self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_ZONE_CONFIG, 8)
+            self.dci_read_data(self.temp_buffer, VL53L5CX_DCI_ZONE_CONFIG, 8)
             self.temp_buffer[0x00] = 4
             self.temp_buffer[0x01] = 4
             self.temp_buffer[0x04] = 8
             self.temp_buffer[0x05] = 8
-            self.vl53l5cx_dci_write_data(self.temp_buffer, VL53L5CX_DCI_ZONE_CONFIG, 8)
+            self.dci_write_data(self.temp_buffer, VL53L5CX_DCI_ZONE_CONFIG, 8)
         elif resolution == VL53L5CX_RESOLUTION_8X8:
-            self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_DSS_CONFIG, 16)
+            self.dci_read_data(self.temp_buffer, VL53L5CX_DCI_DSS_CONFIG, 16)
             self.temp_buffer[0x04] = 16
             self.temp_buffer[0x06] = 16
             self.temp_buffer[0x09] = 1
-            self.vl53l5cx_dci_write_data(self.temp_buffer, VL53L5CX_DCI_DSS_CONFIG, 16)
+            self.dci_write_data(self.temp_buffer, VL53L5CX_DCI_DSS_CONFIG, 16)
 
-            self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_ZONE_CONFIG, 8)
+            self.dci_read_data(self.temp_buffer, VL53L5CX_DCI_ZONE_CONFIG, 8)
             self.temp_buffer[0x00] = 8
             self.temp_buffer[0x01] = 8
             self.temp_buffer[0x04] = 4
             self.temp_buffer[0x05] = 4
-            self.vl53l5cx_dci_write_data(self.temp_buffer, VL53L5CX_DCI_ZONE_CONFIG, 8)
+            self.dci_write_data(self.temp_buffer, VL53L5CX_DCI_ZONE_CONFIG, 8)
         else:
             raise VL53L5CXException(VL53L5CX_STATUS_INVALID_PARAM)
 
         self._send_offset_data(resolution)
         self._send_xtalk_data(resolution)
 
-    def vl53l5cx_get_ranging_frequency_hz(self) -> int:
-        self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_FREQ_HZ, 4)
+    def get_ranging_frequency_hz(self) -> int:
+        self.dci_read_data(self.temp_buffer, VL53L5CX_DCI_FREQ_HZ, 4)
         return self.temp_buffer[0x01]
 
-    def vl53l5cx_set_ranging_frequency_hz(self, frequency_hz: int) -> None:
+    def set_ranging_frequency_hz(self, frequency_hz: int) -> None:
         frequency_hz_buf = [frequency_hz]
-        self.vl53l5cx_dci_replace_data(self.temp_buffer, VL53L5CX_DCI_FREQ_HZ, 4, frequency_hz_buf, 1, 0x01)
+        self.dci_replace_data(self.temp_buffer, VL53L5CX_DCI_FREQ_HZ, 4, frequency_hz_buf, 1, 0x01)
 
-    def vl53l5cx_get_integration_time_ms(self) -> int:
-        self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_INT_TIME, 20)
+    def get_integration_time_ms(self) -> int:
+        self.dci_read_data(self.temp_buffer, VL53L5CX_DCI_INT_TIME, 20)
         return to_long_uint(self.temp_buffer, 0) // 1000
 
-    def vl53l5cx_set_integration_time_ms(self, integration_time_ms: int) -> None:
+    def set_integration_time_ms(self, integration_time_ms: int) -> None:
         # Integration time must be between 2ms and 1000ms
         if integration_time_ms < 2 or integration_time_ms > 1000:
             raise VL53L5CXException(VL53L5CX_STATUS_INVALID_PARAM)
@@ -1104,42 +1104,42 @@ class VL53L5CX:
         buf = [0, 0, 0, 0]
         ulong_to_buffer(integration, buf)
 
-        self.vl53l5cx_dci_replace_data(self.temp_buffer, VL53L5CX_DCI_INT_TIME, 20, buf, 4, 0x00)
+        self.dci_replace_data(self.temp_buffer, VL53L5CX_DCI_INT_TIME, 20, buf, 4, 0x00)
 
-    def vl53l5cx_get_sharpener_percent(self) -> float:
-        self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_SHARPENER, 16)
+    def get_sharpener_percent(self) -> float:
+        self.dci_read_data(self.temp_buffer, VL53L5CX_DCI_SHARPENER, 16)
 
         return (self.temp_buffer[0xD] * 100) / 255
 
-    def vl53l5cx_set_sharpener_percent(self, sharpener_percent: int) -> None:
+    def set_sharpener_percent(self, sharpener_percent: int) -> None:
 
         if sharpener_percent >= 100:
             raise VL53L5CXException(VL53L5CX_STATUS_INVALID_PARAM)
 
         sharpener = [(sharpener_percent * 255) // 100]
-        self.vl53l5cx_dci_replace_data(self.temp_buffer, VL53L5CX_DCI_SHARPENER, 16, sharpener, 1, 0xD)
+        self.dci_replace_data(self.temp_buffer, VL53L5CX_DCI_SHARPENER, 16, sharpener, 1, 0xD)
 
-    def vl53l5cx_get_target_order(self) -> int:
-        self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_TARGET_ORDER, 4)
+    def get_target_order(self) -> int:
+        self.dci_read_data(self.temp_buffer, VL53L5CX_DCI_TARGET_ORDER, 4)
         return self.temp_buffer[0x0]
 
-    def vl53l5cx_set_target_order(self, target_order: int) -> None:
+    def set_target_order(self, target_order: int) -> None:
         if target_order == VL53L5CX_TARGET_ORDER_CLOSEST or target_order == VL53L5CX_TARGET_ORDER_STRONGEST:
             target_order_buf = [target_order]
-            self.vl53l5cx_dci_replace_data(self.temp_buffer, VL53L5CX_DCI_TARGET_ORDER, 4, target_order_buf, 1, 0x0)
+            self.dci_replace_data(self.temp_buffer, VL53L5CX_DCI_TARGET_ORDER, 4, target_order_buf, 1, 0x0)
         else:
             raise VL53L5CXException(VL53L5CX_STATUS_INVALID_PARAM)
 
-    def vl53l5cx_get_ranging_mode(self) -> int:
-        self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_RANGING_MODE, 8)
+    def get_ranging_mode(self) -> int:
+        self.dci_read_data(self.temp_buffer, VL53L5CX_DCI_RANGING_MODE, 8)
 
         if self.temp_buffer[0x01] == 0x1:
             return VL53L5CX_RANGING_MODE_CONTINUOUS
 
         return VL53L5CX_RANGING_MODE_AUTONOMOUS
 
-    def vl53l5cx_set_ranging_mode(self, ranging_mode: int) -> None:
-        self.vl53l5cx_dci_read_data(self.temp_buffer, VL53L5CX_DCI_RANGING_MODE, 8)
+    def set_ranging_mode(self, ranging_mode: int) -> None:
+        self.dci_read_data(self.temp_buffer, VL53L5CX_DCI_RANGING_MODE, 8)
 
         if ranging_mode == VL53L5CX_RANGING_MODE_CONTINUOUS:
             self.temp_buffer[0x01] = 0x1
@@ -1152,12 +1152,12 @@ class VL53L5CX:
         else:
             raise VL53L5CXException(VL53L5CX_STATUS_INVALID_PARAM)
 
-        self.vl53l5cx_dci_write_data(self.temp_buffer, VL53L5CX_DCI_RANGING_MODE, 8)
+        self.dci_write_data(self.temp_buffer, VL53L5CX_DCI_RANGING_MODE, 8)
 
         buf = [single_range, 0, 0, 0]
-        self.vl53l5cx_dci_write_data(buf, VL53L5CX_DCI_SINGLE_RANGE, 4)
+        self.dci_write_data(buf, VL53L5CX_DCI_SINGLE_RANGE, 4)
 
-    def vl53l5cx_dci_read_data(self,
+    def dci_read_data(self,
                                data: List[int],
                                index: int,
                                data_size: int) -> None:
@@ -1189,7 +1189,7 @@ class VL53L5CX:
                 data[i] = self.temp_buffer[i + 4]
             # data[:data_size] = self.temp_buffer[4: data_size + 4]
 
-    def vl53l5cx_dci_write_data(self,
+    def dci_write_data(self,
                                 data: List[int],
                                 index: int,
                                 data_size: int) -> None:
@@ -1225,7 +1225,7 @@ class VL53L5CX:
 
             self.swap_buffer(data, data_size)
 
-    def vl53l5cx_dci_replace_data(self,
+    def dci_replace_data(self,
                                   data: List[int],
                                   index: int,
                                   data_size: int,
@@ -1233,6 +1233,6 @@ class VL53L5CX:
                                   new_data_size: int,
                                   new_data_pos: int) -> None:
 
-        self.vl53l5cx_dci_read_data(data, index, data_size)
+        self.dci_read_data(data, index, data_size)
         data[new_data_pos: new_data_pos + data_size] = new_data[:new_data_size]
-        self.vl53l5cx_dci_write_data(data, index, data_size)
+        self.dci_write_data(data, index, data_size)
