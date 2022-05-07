@@ -174,66 +174,66 @@ class VL53L5CX:
         else:
             self.L5CX_MOT_SIZE = 144
 
-        self.api.VL53L5CX_MAX_RESULTS_SIZE = (
+        self.VL53L5CX_MAX_RESULTS_SIZE = (
             40
             + self.L5CX_AMB_SIZE + self.L5CX_SPAD_SIZE + self.L5CX_NTAR_SIZE + self.L5CX_SPS_SIZE
             + self.L5CX_SIGR_SIZE + self.L5CX_DIST_SIZE + self.L5CX_RFLEST_SIZE + self.L5CX_STA_SIZE
             + self.L5CX_MOT_SIZE + 8)
 
-        if self.api.VL53L5CX_MAX_RESULTS_SIZE < 1024:
-            self.api.VL53L5CX_TEMPORARY_BUFFER_SIZE = 1024
+        if self.VL53L5CX_MAX_RESULTS_SIZE < 1024:
+            self.VL53L5CX_TEMPORARY_BUFFER_SIZE = 1024
         else:
-            self.api.VL53L5CX_TEMPORARY_BUFFER_SIZE = self.api.VL53L5CX_MAX_RESULTS_SIZE
+            self.VL53L5CX_TEMPORARY_BUFFER_SIZE = self.VL53L5CX_MAX_RESULTS_SIZE
 
         if nb_target_per_zone == 1:
-            self.api.VL53L5CX_START_BH = 0x0000000D
-            self.api.VL53L5CX_METADATA_BH = 0x54B400C0
-            self.api.VL53L5CX_COMMONDATA_BH = 0x54C00040
-            self.api.VL53L5CX_AMBIENT_RATE_BH = 0x54D00104
-            self.api.VL53L5CX_SPAD_COUNT_BH = 0x55D00404
-            self.api.VL53L5CX_NB_TARGET_DETECTED_BH = 0xCF7C0401
-            self.api.VL53L5CX_SIGNAL_RATE_BH = 0xCFBC0404
-            self.api.VL53L5CX_RANGE_SIGMA_MM_BH = 0xD2BC0402
-            self.api.VL53L5CX_DISTANCE_BH = 0xD33C0402
-            self.api.VL53L5CX_REFLECTANCE_BH = 0xD43C0401
-            self.api.VL53L5CX_TARGET_STATUS_BH = 0xD47C0401
-            self.api.VL53L5CX_MOTION_DETECT_BH = 0xCC5008C0
+            self.VL53L5CX_START_BH = 0x0000000D
+            self.VL53L5CX_METADATA_BH = 0x54B400C0
+            self.VL53L5CX_COMMONDATA_BH = 0x54C00040
+            self.VL53L5CX_AMBIENT_RATE_BH = 0x54D00104
+            self.VL53L5CX_SPAD_COUNT_BH = 0x55D00404
+            self.VL53L5CX_NB_TARGET_DETECTED_BH = 0xCF7C0401
+            self.VL53L5CX_SIGNAL_RATE_BH = 0xCFBC0404
+            self.VL53L5CX_RANGE_SIGMA_MM_BH = 0xD2BC0402
+            self.VL53L5CX_DISTANCE_BH = 0xD33C0402
+            self.VL53L5CX_REFLECTANCE_BH = 0xD43C0401
+            self.VL53L5CX_TARGET_STATUS_BH = 0xD47C0401
+            self.VL53L5CX_MOTION_DETECT_BH = 0xCC5008C0
 
-            self.api.VL53L5CX_METADATA_IDX = 0x54B4
-            self.api.VL53L5CX_SPAD_COUNT_IDX = 0x55D0
-            self.api.VL53L5CX_AMBIENT_RATE_IDX = 0x54D0
-            self.api.VL53L5CX_NB_TARGET_DETECTED_IDX = 0xCF7C
-            self.api.VL53L5CX_SIGNAL_RATE_IDX = 0xCFBC
-            self.api.VL53L5CX_RANGE_SIGMA_MM_IDX = 0xD2BC
-            self.api.VL53L5CX_DISTANCE_IDX = 0xD33C
-            self.api.VL53L5CX_REFLECTANCE_EST_PC_IDX = 0xD43C
-            self.api.VL53L5CX_TARGET_STATUS_IDX = 0xD47C
-            self.api.VL53L5CX_MOTION_DETEC_IDX = 0xCC50
+            self.VL53L5CX_METADATA_IDX = 0x54B4
+            self.VL53L5CX_SPAD_COUNT_IDX = 0x55D0
+            self.VL53L5CX_AMBIENT_RATE_IDX = 0x54D0
+            self.VL53L5CX_NB_TARGET_DETECTED_IDX = 0xCF7C
+            self.VL53L5CX_SIGNAL_RATE_IDX = 0xCFBC
+            self.VL53L5CX_RANGE_SIGMA_MM_IDX = 0xD2BC
+            self.VL53L5CX_DISTANCE_IDX = 0xD33C
+            self.VL53L5CX_REFLECTANCE_EST_PC_IDX = 0xD43C
+            self.VL53L5CX_TARGET_STATUS_IDX = 0xD47C
+            self.VL53L5CX_MOTION_DETEC_IDX = 0xCC50
 
         else:
-            self.api.VL53L5CX_START_BH = 0x0000000D
-            self.api.VL53L5CX_METADATA_BH = 0x54B400C0
-            self.api.VL53L5CX_COMMONDATA_BH = 0x54C00040
-            self.api.VL53L5CX_AMBIENT_RATE_BH = 0x54D00104
-            self.api.VL53L5CX_NB_TARGET_DETECTED_BH = 0x57D00401
-            self.api.VL53L5CX_SPAD_COUNT_BH = 0x55D00404
-            self.api.VL53L5CX_SIGNAL_RATE_BH = 0x58900404
-            self.api.VL53L5CX_RANGE_SIGMA_MM_BH = 0x64900402
-            self.api.VL53L5CX_DISTANCE_BH = 0x66900402
-            self.api.VL53L5CX_REFLECTANCE_BH = 0x6A900401
-            self.api.VL53L5CX_TARGET_STATUS_BH = 0x6B900401
-            self.api.VL53L5CX_MOTION_DETECT_BH = 0xCC5008C0
+            self.VL53L5CX_START_BH = 0x0000000D
+            self.VL53L5CX_METADATA_BH = 0x54B400C0
+            self.VL53L5CX_COMMONDATA_BH = 0x54C00040
+            self.VL53L5CX_AMBIENT_RATE_BH = 0x54D00104
+            self.VL53L5CX_NB_TARGET_DETECTED_BH = 0x57D00401
+            self.VL53L5CX_SPAD_COUNT_BH = 0x55D00404
+            self.VL53L5CX_SIGNAL_RATE_BH = 0x58900404
+            self.VL53L5CX_RANGE_SIGMA_MM_BH = 0x64900402
+            self.VL53L5CX_DISTANCE_BH = 0x66900402
+            self.VL53L5CX_REFLECTANCE_BH = 0x6A900401
+            self.VL53L5CX_TARGET_STATUS_BH = 0x6B900401
+            self.VL53L5CX_MOTION_DETECT_BH = 0xCC5008C0
 
-            self.api.VL53L5CX_METADATA_IDX = 0x54B4
-            self.api.VL53L5CX_SPAD_COUNT_IDX = 0x55D0
-            self.api.VL53L5CX_AMBIENT_RATE_IDX = 0x54D0
-            self.api.VL53L5CX_NB_TARGET_DETECTED_IDX = 0x57D0
-            self.api.VL53L5CX_SIGNAL_RATE_IDX = 0x5890
-            self.api.VL53L5CX_RANGE_SIGMA_MM_IDX = 0x6490
-            self.api.VL53L5CX_DISTANCE_IDX = 0x6690
-            self.api.VL53L5CX_REFLECTANCE_EST_PC_IDX = 0x6A90
-            self.api.VL53L5CX_TARGET_STATUS_IDX = 0x6B90
-            self.api.VL53L5CX_MOTION_DETEC_IDX = 0xCC50
+            self.VL53L5CX_METADATA_IDX = 0x54B4
+            self.VL53L5CX_SPAD_COUNT_IDX = 0x55D0
+            self.VL53L5CX_AMBIENT_RATE_IDX = 0x54D0
+            self.VL53L5CX_NB_TARGET_DETECTED_IDX = 0x57D0
+            self.VL53L5CX_SIGNAL_RATE_IDX = 0x5890
+            self.VL53L5CX_RANGE_SIGMA_MM_IDX = 0x6490
+            self.VL53L5CX_DISTANCE_IDX = 0x6690
+            self.VL53L5CX_REFLECTANCE_EST_PC_IDX = 0x6A90
+            self.VL53L5CX_TARGET_STATUS_IDX = 0x6B90
+            self.VL53L5CX_MOTION_DETEC_IDX = 0xCC50
 
         self.i2c_address = api.VL53L5CX_DEFAULT_I2C_ADDRESS
 
@@ -250,28 +250,7 @@ class VL53L5CX:
         self.default_xtalk: int = 0
         self.offset_data = [0] * api.VL53L5CX_OFFSET_BUFFER_SIZE
         self.xtalk_data = [0] * api.VL53L5CX_XTALK_BUFFER_SIZE
-        self.temp_buffer = [0] * self.api.VL53L5CX_TEMPORARY_BUFFER_SIZE
-
-    @staticmethod
-    def swap_buffer(buffer: List[int], size: int) -> None:
-        # Original code:
-        # 	for(i = 0; i < size; i = i + 4)
-        # 	{
-        # 		tmp = (
-        # 		  buffer[i]<<24)
-        # 		|(buffer[i+1]<<16)
-        # 		|(buffer[i+2]<<8)
-        # 		|(buffer[i+3]);
-        #
-        # 		memcpy(&(buffer[i]), &tmp, 4);
-        # 	}
-        for i in range(0, min(size, len(buffer)), 4):
-            t = buffer[i]
-            buffer[i] = buffer[i + 3]
-            buffer[i + 3] = t
-            t = buffer[i + 1]
-            buffer[i + 1] = buffer[i + 2]
-            buffer[i + 2] = t
+        self.temp_buffer = [0] * self.VL53L5CX_TEMPORARY_BUFFER_SIZE
 
     def rd_multi(self, addr: int, buffer: List[int], size: int) -> None:
         write_addr = self.i2c_msg.write(self.i2c_address, [addr >> 8 & 0xff, addr & 0xff])
@@ -412,7 +391,7 @@ class VL53L5CX:
         if resolution == api.VL53L5CX_RESOLUTION_4X4:
             self.temp_buffer[16:16 + len(dss_4x4)] = dss_4x4[:]
 
-            self.swap_buffer(self.temp_buffer, api.VL53L5CX_OFFSET_BUFFER_SIZE)
+            util.swap_buffer(self.temp_buffer, api.VL53L5CX_OFFSET_BUFFER_SIZE)
 
             if DEBUG_LOW_LEVEL_LOGIC_SEND_OFFSET_DATA:
                 print(f"_send_offset_data: (pre) signal_grid_len={len(signal_grid)}, range_grid_len={len(range_grid)}, temp_buffer_len={len(self.temp_buffer)}")
@@ -485,7 +464,7 @@ class VL53L5CX:
             self.temp_buffer[0x3C: 0x3C + len(signal_grid)] = signal_grid[:]
             self.temp_buffer[0x140: 0x140 + len(range_grid)] = range_grid[:]
 
-            self.swap_buffer(self.temp_buffer, api.VL53L5CX_OFFSET_BUFFER_SIZE)
+            util.swap_buffer(self.temp_buffer, api.VL53L5CX_OFFSET_BUFFER_SIZE)
 
         for k in range(api.VL53L5CX_OFFSET_BUFFER_SIZE - 4):
             self.temp_buffer[k] = self.temp_buffer[k + 8]
@@ -512,7 +491,7 @@ class VL53L5CX:
             self.temp_buffer[0x8: 0x8 + len(res4x4)] = res4x4[:]
             self.temp_buffer[0x020: 0x020 + len(dss_4x4)] = dss_4x4[:]
 
-            self.swap_buffer(self.temp_buffer, api.VL53L5CX_XTALK_BUFFER_SIZE)
+            util.swap_buffer(self.temp_buffer, api.VL53L5CX_XTALK_BUFFER_SIZE)
             signal_grid[:] = self.temp_buffer[0x34:0x34 + len(signal_grid)]
 
             for j in range(4):
@@ -527,7 +506,7 @@ class VL53L5CX:
 
             signal_grid[0x10 * 4:0x10 * 4 + 192] = [0] * 192
             self.temp_buffer[0x34: 0x34 + len(signal_grid)] = signal_grid[:]
-            self.swap_buffer(self.temp_buffer, api.VL53L5CX_XTALK_BUFFER_SIZE)
+            util.swap_buffer(self.temp_buffer, api.VL53L5CX_XTALK_BUFFER_SIZE)
             self.temp_buffer[0x134:0x134 + len(profile_4x4)] = profile_4x4[:]
             self.temp_buffer[0x078:0x078 + 4] = [0] * 4
 
@@ -547,8 +526,8 @@ class VL53L5CX:
         # single_range = [0, 0, 0, 0x01]
         single_range = [0x01, 0, 0, 0]
 
-        self.default_xtalk = self.buffers.api.VL53L5CX_DEFAULT_XTALK
-        self.default_configuration = self.buffers.api.VL53L5CX_DEFAULT_CONFIGURATION
+        self.default_xtalk = self.buffers.VL53L5CX_DEFAULT_XTALK
+        self.default_configuration = self.buffers.VL53L5CX_DEFAULT_CONFIGURATION
 
         # reboot sequence
         self.wr_byte(0x7fff, 0x00)
@@ -620,11 +599,11 @@ class VL53L5CX:
 
         # Download FW into VL53L5
         self.wr_byte(0x7fff, 0x09)
-        self.wr_multi(0, self.buffers.api.VL53L5CX_FIRMWARE[0:0x8000], 0x8000)
+        self.wr_multi(0, self.buffers.VL53L5CX_FIRMWARE[0:0x8000], 0x8000)
         self.wr_byte(0x7fff, 0x0a)
-        self.wr_multi(0, self.buffers.api.VL53L5CX_FIRMWARE[0x8000:0x10000], 0x8000)
+        self.wr_multi(0, self.buffers.VL53L5CX_FIRMWARE[0x8000:0x10000], 0x8000)
         self.wr_byte(0x7fff, 0x0b)
-        self.wr_multi(0, self.buffers.api.VL53L5CX_FIRMWARE[0x10000:0x15000], 0x5000)
+        self.wr_multi(0, self.buffers.VL53L5CX_FIRMWARE[0x10000:0x15000], 0x5000)
         self.wr_byte(0x7fff, 0x01)
 
         # Check if FW correctly downloaded
@@ -653,20 +632,20 @@ class VL53L5CX:
         self.wr_byte(0x7fff, 0x02)
 
         # Get offset NVM data and store them into the offset buffer
-        self.wr_multi(0x2fd8, self.buffers.api.VL53L5CX_GET_NVM_CMD, len(self.buffers.api.VL53L5CX_GET_NVM_CMD))
+        self.wr_multi(0x2fd8, self.buffers.VL53L5CX_GET_NVM_CMD, len(self.buffers.VL53L5CX_GET_NVM_CMD))
         self._poll_for_answer(4, 0, api.VL53L5CX_UI_CMD_STATUS, 0xff, 2)
         self.rd_multi(api.VL53L5CX_UI_CMD_START, self.temp_buffer, api.VL53L5CX_NVM_DATA_SIZE)
         self.offset_data[:api.VL53L5CX_OFFSET_BUFFER_SIZE] = self.temp_buffer[:api.VL53L5CX_OFFSET_BUFFER_SIZE]
         self._send_offset_data(api.VL53L5CX_RESOLUTION_4X4)
 
         # Set default Xtalk shape. Send Xtalk to sensor
-        self.xtalk_data[:api.VL53L5CX_XTALK_BUFFER_SIZE] = self.buffers.api.VL53L5CX_DEFAULT_XTALK[:api.VL53L5CX_XTALK_BUFFER_SIZE]
+        self.xtalk_data[:api.VL53L5CX_XTALK_BUFFER_SIZE] = self.buffers.VL53L5CX_DEFAULT_XTALK[:api.VL53L5CX_XTALK_BUFFER_SIZE]
         self._send_xtalk_data(api.VL53L5CX_RESOLUTION_4X4)
 
         # Send default configuration to VL53L5CX firmware
         self.wr_multi(0x2c34,
                       self.default_configuration,
-                      len(self.buffers.api.VL53L5CX_DEFAULT_CONFIGURATION))
+                      len(self.buffers.VL53L5CX_DEFAULT_CONFIGURATION))
         self._poll_for_answer(4, 1, api.VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
 
         self.dci_write_data(pipe_ctrl, api.VL53L5CX_DCI_PIPE_CONTROL, len(pipe_ctrl))
@@ -735,18 +714,18 @@ class VL53L5CX:
         output_bh_enable = [0x00000007, 0x00000000, 0x00000000, 0xC0000000]
 
         # Send addresses of possible output
-        output = [self.api.VL53L5CX_START_BH,
-                  self.api.VL53L5CX_METADATA_BH,
-                  self.api.VL53L5CX_COMMONDATA_BH,
-                  self.api.VL53L5CX_AMBIENT_RATE_BH,
-                  self.api.VL53L5CX_SPAD_COUNT_BH,
-                  self.api.VL53L5CX_NB_TARGET_DETECTED_BH,
-                  self.api.VL53L5CX_SIGNAL_RATE_BH,
-                  self.api.VL53L5CX_RANGE_SIGMA_MM_BH,
-                  self.api.VL53L5CX_DISTANCE_BH,
-                  self.api.VL53L5CX_REFLECTANCE_BH,
-                  self.api.VL53L5CX_TARGET_STATUS_BH,
-                  self.api.VL53L5CX_MOTION_DETECT_BH]
+        output = [self.VL53L5CX_START_BH,
+                  self.VL53L5CX_METADATA_BH,
+                  self.VL53L5CX_COMMONDATA_BH,
+                  self.VL53L5CX_AMBIENT_RATE_BH,
+                  self.VL53L5CX_SPAD_COUNT_BH,
+                  self.VL53L5CX_NB_TARGET_DETECTED_BH,
+                  self.VL53L5CX_SIGNAL_RATE_BH,
+                  self.VL53L5CX_RANGE_SIGMA_MM_BH,
+                  self.VL53L5CX_DISTANCE_BH,
+                  self.VL53L5CX_REFLECTANCE_BH,
+                  self.VL53L5CX_TARGET_STATUS_BH,
+                  self.VL53L5CX_MOTION_DETECT_BH]
 
         # Enable selected outputs in the 'platform.h' file
         if not self.disable_ambient_per_spad:
@@ -912,7 +891,7 @@ class VL53L5CX:
             print(f"api.VL53L5CX_get_ranging_data: data_read_size={self.data_read_size}")
         self.rd_multi(0x0, self.temp_buffer, self.data_read_size)
         self.streamcount = self.temp_buffer[0]
-        self.swap_buffer(self.temp_buffer, self.data_read_size)
+        util.swap_buffer(self.temp_buffer, self.data_read_size)
         if DEBUG_LOW_LEVEL_LOGIC_GET_RANGING_DATA:
             print(f"api.VL53L5CX_get_ranging_data: streamcount={self.streamcount}")
 
@@ -927,25 +906,25 @@ class VL53L5CX:
 
             bh_ptr_idx = self.temp_buffer[i + 2] + self.temp_buffer[i + 3] * 256
 
-            if bh_ptr_idx == self.api.VL53L5CX_METADATA_IDX:
+            if bh_ptr_idx == self.VL53L5CX_METADATA_IDX:
                 p_results.silicon_temp_degc = self.temp_buffer[i + 12]
-            elif not self.disable_ambient_per_spad and bh_ptr_idx == self.api.VL53L5CX_AMBIENT_RATE_IDX:
+            elif not self.disable_ambient_per_spad and bh_ptr_idx == self.VL53L5CX_AMBIENT_RATE_IDX:
                 util.to_ulong_array(p_results.ambient_per_spad, self.temp_buffer, i + 4, msize)
-            elif not self.disable_nb_spads_enabled and bh_ptr_idx == self.api.VL53L5CX_SPAD_COUNT_IDX:
+            elif not self.disable_nb_spads_enabled and bh_ptr_idx == self.VL53L5CX_SPAD_COUNT_IDX:
                 util.to_ulong_array(p_results.nb_spads_enabled, self.temp_buffer, i + 4, msize)
-            elif not self.disable_nb_target_detected and bh_ptr_idx == self.api.VL53L5CX_NB_TARGET_DETECTED_IDX:
+            elif not self.disable_nb_target_detected and bh_ptr_idx == self.VL53L5CX_NB_TARGET_DETECTED_IDX:
                 p_results.nb_target_detected[:msize] = self.temp_buffer[i + 4: i + 4 + msize]
-            elif not self.disable_signal_per_spad and bh_ptr_idx == self.api.VL53L5CX_SIGNAL_RATE_IDX:
+            elif not self.disable_signal_per_spad and bh_ptr_idx == self.VL53L5CX_SIGNAL_RATE_IDX:
                 util.to_ulong_array(p_results.signal_per_spad, self.temp_buffer, i + 4, msize)
-            elif not self.disable_range_sigma_mm and bh_ptr_idx == self.api.VL53L5CX_RANGE_SIGMA_MM_IDX:
+            elif not self.disable_range_sigma_mm and bh_ptr_idx == self.VL53L5CX_RANGE_SIGMA_MM_IDX:
                 util.to_uint_array(p_results.range_sigma_mm, self.temp_buffer, i + 4, msize)
-            elif not self.disable_distance_mm and bh_ptr_idx == self.api.VL53L5CX_DISTANCE_IDX:
+            elif not self.disable_distance_mm and bh_ptr_idx == self.VL53L5CX_DISTANCE_IDX:
                 util.to_uint_array(p_results.distance_mm, self.temp_buffer, i + 4, msize)
-            elif not self.disable_reflectance_percent and bh_ptr_idx == self.api.VL53L5CX_REFLECTANCE_EST_PC_IDX:
+            elif not self.disable_reflectance_percent and bh_ptr_idx == self.VL53L5CX_REFLECTANCE_EST_PC_IDX:
                 p_results.reflectance[:msize] = self.temp_buffer[i + 4: i + 4 + msize]
-            elif not self.disable_target_status and bh_ptr_idx == self.api.VL53L5CX_TARGET_STATUS_IDX:
+            elif not self.disable_target_status and bh_ptr_idx == self.VL53L5CX_TARGET_STATUS_IDX:
                 p_results.target_status[:msize] = self.temp_buffer[i + 4: i + 4 + msize]
-            elif not self.disable_motion_indicator and bh_ptr_idx == self.api.VL53L5CX_MOTION_DETEC_IDX:
+            elif not self.disable_motion_indicator and bh_ptr_idx == self.VL53L5CX_MOTION_DETEC_IDX:
 
                 if DEBUG_LOW_LEVEL_LOGIC_GET_RANGING_DATA:
                     print(f"api.VL53L5CX_get_ranging_data: i+4={i + 4} msize={msize}, len(self.temp_buffer)={len(self.temp_buffer)}")
@@ -1105,7 +1084,7 @@ class VL53L5CX:
                0x00, 0x02, 0x00, 0x08]
 
         # Check if tmp buffer is large enough
-        if (data_size + 12) > self.api.VL53L5CX_TEMPORARY_BUFFER_SIZE:
+        if (data_size + 12) > self.VL53L5CX_TEMPORARY_BUFFER_SIZE:
             raise VL53L5CXException(api.VL53L5CX_STATUS_ERROR)
         else:
             cmd[0] = (index >> 8) & 0xff
@@ -1119,7 +1098,7 @@ class VL53L5CX:
 
             # Read new data sent (4 bytes header + data_size + 8 bytes footer)
             self.rd_multi(api.VL53L5CX_UI_CMD_START, self.temp_buffer, rd_size)
-            self.swap_buffer(self.temp_buffer, data_size + 12)
+            util.swap_buffer(self.temp_buffer, data_size + 12)
 
             # Copy data from FW into input structure (-4 bytes to remove header)
             for i in range(data_size):
@@ -1139,7 +1118,7 @@ class VL53L5CX:
         address = api.VL53L5CX_UI_CMD_END - (data_size + 12) + 1
 
         # Check if cmd buffer is large enough */
-        if data_size + 12 > self.api.VL53L5CX_TEMPORARY_BUFFER_SIZE:
+        if data_size + 12 > self.VL53L5CX_TEMPORARY_BUFFER_SIZE:
             raise VL53L5CXException(api.VL53L5CX_STATUS_ERROR)
         else:
             headers[0] = index >> 8 & 0xff
@@ -1148,7 +1127,7 @@ class VL53L5CX:
             headers[3] = (data_size & 0xf) << 4
 
             # Copy data from structure to FW format (+4 bytes to add header)
-            self.swap_buffer(data, data_size)
+            util.swap_buffer(data, data_size)
             for i in range(data_size - 1, -1, -1):
                 self.temp_buffer[i + 4] = data[i]
 
@@ -1160,7 +1139,7 @@ class VL53L5CX:
             self.wr_multi(address, self.temp_buffer, data_size + 12)
             self._poll_for_answer(4, 1, api.VL53L5CX_UI_CMD_STATUS, 0xff, 0x03)
 
-            self.swap_buffer(data, data_size)
+            util.swap_buffer(data, data_size)
 
     def dci_replace_data(self,
                          data: List[int],

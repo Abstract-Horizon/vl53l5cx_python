@@ -1,6 +1,6 @@
 import time
 
-from vl53l5cx.vl53l5cx import VL53L5CX
+from vl53l5cx import VL53L5CX
 
 
 driver = VL53L5CX()
