@@ -8,7 +8,7 @@ with open("README.md", "r") as fh:
 
 setup(
     name="VL53L5CX",
-    version="1.0.0",
+    version="1.0.1",
     author="Daniel Sendula",
     description="Python native implementation of VL53L5CX ultra light driver code",
     long_description=long_description,
