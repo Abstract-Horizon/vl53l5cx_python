@@ -740,7 +740,7 @@ class VL53L5CX:
 
     def set_i2c_address(self, i2c_address: int) -> None:
         self.wr_byte(0x7fff, 0x00)
-        self.wr_byte(0x4, i2c_address >> 1)
+        self.wr_byte(0x4, i2c_address)
         self.i2c_address = i2c_address
         self.wr_byte(0x7fff, 0x02)
 
@@ -948,7 +948,6 @@ class VL53L5CX:
         self.wr_byte(0x7fff, 0x02)
 
     def check_data_ready(self) -> bool:
-
         self.rd_multi(0x0, self.temp_buffer, 4)
 
         if ((self.temp_buffer[0] != self.streamcount)
@@ -1015,7 +1014,6 @@ class VL53L5CX:
             i += msize
 
         if not self.use_raw_format:
-
             # Convert data into their real format */
             if not self.disable_ambient_per_spad:
                 for i in range(VL53L5CX_RESOLUTION_8X8):
